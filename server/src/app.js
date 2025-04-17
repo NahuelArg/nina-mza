@@ -16,7 +16,7 @@ server.use(cookieParser());
 server.use(
   cors({
     origin: [
-      "https://ninashowroom.techwebstudio.com.ar",
+      "https://ninamza.com.ar",
       "https://nina-ecommerce-roan.vercel.app",
       "https://server-ninashowroom.vercel.app",
       "http://localhost:5173"
