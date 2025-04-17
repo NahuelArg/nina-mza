@@ -17,10 +17,8 @@ server.use(
   cors({
     origin: [
       "https://ninamza.com.ar",
-      "https://nina-ecommerce-roan.vercel.app",
-      "https://server-ninashowroom.vercel.app",
-      "http://localhost:5173"
-    ],
+      "http://localhost:5173",
+      "https://nina-mza.onrender.com"],
     credentials: true,
   })
 );
