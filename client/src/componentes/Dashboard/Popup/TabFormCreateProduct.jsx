@@ -271,8 +271,8 @@ export default function TabFormCreateProduct({ isOpen, onClose, product }) {
             <option value="perfumes">Accesorios</option>
             <option value="conjuntos">Calzados</option>
             <option value="conjuntos">Vapers</option>
-            <option value="Perfumes"></option>
-            <option value="Bikinis"></option>
+            <option value="Perfumes">Perfumes</option>
+            <option value="Bikinis">Bikinis</option>
           </select>
           {errors.categoria && (
             <p className="text-red-500 text-xs">{errors.categoria}</p>

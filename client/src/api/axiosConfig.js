@@ -1,8 +1,13 @@
+// src/api/axiosConfig.js
 import axios from 'axios';
 
 const instance = axios.create({
-  baseURL: 'https://nina-mza.onrender.com/api', // Apunta al backend desplegado
-  withCredentials: true,  // Si es necesario, habilita las cookies
+  baseURL:  'https://nina-mza.onrender.com',
+  //  baseURL: 'http://localhost:3001',
+  withCredentials: true, // Para enviar cookies con cada solicitud si es necesario
 });
 
 export default instance;
+
+
+
