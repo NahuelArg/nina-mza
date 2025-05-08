@@ -23,6 +23,11 @@ server.use(
   })
 );
 
+// Ruta para manejar solicitudes a la raíz
+server.get('/', (req, res) => {
+  res.send('Bienvenido a la API de Nina Showroom');
+});
+
 // Rutas API y middleware
 server.use("/api", router); // Montar el router
 
