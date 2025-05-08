@@ -1,4 +1,4 @@
-export default function validationUserForm(formData) {
+export default function validationUserForm(formData = {}) {
   const errors = {};
 
   // Validar nombre

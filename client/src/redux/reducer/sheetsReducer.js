@@ -137,7 +137,7 @@ const sheetsReducer = (state = initialState, action) => {
 
   // Verifica que item.nombre exista y no sea undefined
   const searchedProducts = state.sheetsData.filter(item =>
-    item.nombre && item.nombre.toLowerCase().includes(searchTerm)
+    item && item.nombre && item.nombre.toLowerCase().includes(searchTerm)
   );
 
   return {
