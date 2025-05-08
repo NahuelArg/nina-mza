@@ -2,9 +2,9 @@
 import axios from 'axios';
 
 const instance = axios.create({
-  //baseURL:  'https://nina-mza.onrender.com',
+  baseURL:  'https://nina-mza.onrender.com',
   
-    baseURL: 'http://localhost:3000',
+    //baseURL: 'http://localhost:3000',
   withCredentials: true, // Para enviar cookies con cada solicitud si es necesario
 });
 
