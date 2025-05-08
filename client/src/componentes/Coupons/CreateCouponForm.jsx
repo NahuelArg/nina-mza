@@ -17,9 +17,9 @@ const CreateCouponForm = ({ onClose }) => {
 
   const handleCategoryChange = (category) => {
     setSelectedCategories((prevSelected) =>
-      prevSelected.includes(category)
+      Array.isArray(prevSelected) && prevSelected.includes(category)
         ? prevSelected.filter((cat) => cat !== category)
-        : [...prevSelected, category]
+        : [...(prevSelected || []), category]
     );
   };
 
