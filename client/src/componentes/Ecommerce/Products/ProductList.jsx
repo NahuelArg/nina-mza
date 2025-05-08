@@ -62,7 +62,7 @@ export default function ProductList({ allProducts }) {
                   key={product.id}
                   id={product.id}
                   name={product.nombre}
-                  url={product.url}
+                  images={product.images}
                   sku={product.sku}
                   price={product.precio}
                   quantity={product.stock}

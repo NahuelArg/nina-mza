@@ -35,9 +35,16 @@ export const fetchSheets = () => async (dispatch) => {
         Authorization: `Bearer ${token}`,
       },
     });
+
+    // Map imageUrls to the url field for each product
+    const productsWithUrls = res.data.products.map((product) => ({
+      ...product,
+      url: Array.isArray(product.imageUrls) ? product.imageUrls.join(",") : product.imageUrls || "",
+    }));
+
     dispatch({
       type: FETCH_SHEETS,
-      payload: res.data.products,
+      payload: productsWithUrls,
     });
   } catch (error) {
     console.log(error);
@@ -136,28 +143,54 @@ export const publicProductById = (id) => async (dispatch) => {
 
 //UPLOAD IMAGE
 export const uploadImages = (formData) => async (dispatch) => {
-    try {
-      const response = await instance.post(`/api/sheets/images`, formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
-      if (response.status === 200) {
-        toast.success("Imagen cargada");
-        dispatch({ type: UPLOAD_IMAGES_SUCCESS, payload: response.data.links });
-      } else {
-        toast.error("No se pudo cargar la imagen");
-      }
-      setTimeout(() => {
-        toast.dismiss();
-      }, 2000);
-    } catch (error) {
-      console.error("Error uploading images:", error);
-      dispatch({
-        type: UPLOAD_IMAGES_FAILURE,
-        payload: "Error uploading images",
-      });
+  try {
+    const token = localStorage.getItem("authToken");
+
+    if (!token) {
+      toast.error("No se ha encontrado un token de autenticación");
+      return;
     }
-  };
-  
+
+    console.log("TOKEN ENVIADO:", token);
+
+    const response = await instance.post("/api/sheets/images", formData, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    // Validar la respuesta del servidor
+    if (response.status === 200) {
+      const imageUrls = response.data.imageUrls || response.data.imageUrl;
+
+      if (Array.isArray(imageUrls)) {
+        toast.success("Imágenes cargadas exitosamente");
+        dispatch({
+          type: UPLOAD_IMAGES_SUCCESS,
+          payload: imageUrls, // array de URLs
+        });
+      } else {
+        toast.error("El servidor no devolvió un array de URLs");
+      }
+    } else {
+      toast.error("No se pudieron cargar las imágenes");
+    }
+
+    setTimeout(() => {
+      toast.dismiss();
+    }, 2000);
+  } catch (error) {
+    console.error("Error uploading images:", error);
+    toast.error("Error al cargar las imágenes, por favor intente de nuevo.");
+    dispatch({
+      type: UPLOAD_IMAGES_FAILURE,
+      payload: "Error uploading images",
+    });
+  }
+};
+
+
+
   export const clearImages = () => ({
     type: CLEAR_IMAGES,
   });

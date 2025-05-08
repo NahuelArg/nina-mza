@@ -336,7 +336,7 @@ const Cart = ({ product, calcularTotal, usuario }) => {
           >
             {product?.length > 0 ? (
               product?.map((prod, i) => {
-                const imgUrl = prod?.url?.split(",")[0];
+                const imgUrl = prod?.images?.split(",")[0];
                 const colorsArray = processColors(prod?.color);
 
                 return (

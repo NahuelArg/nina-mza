@@ -1,9 +1,13 @@
 import { useState, useEffect, useMemo } from "react";
+
 import { useDispatch, useSelector } from "react-redux";
 import Compressor from "compressorjs";
 import Spinner from "../Spinner/Spinner";
 import validationProductForm from "./validationProductForm";
 import toast from "react-hot-toast";
+import axios from "axios";
+const CLOUDINARY_API_KEY = import.meta.env.VITE_CLOUDINARY_API_KEY;
+const CLOUDINARY_CLOUD_NAME = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME;
 import {
   addSheetRow,
   clearImages,
@@ -21,11 +25,10 @@ export default function TabFormCreateProduct({ isOpen, onClose, product }) {
     stock: "",
     color: "",
     precio: 0,
-    url: [],
+    images: [],
   });
   const [errors, setErrors] = useState({});
   const img = useSelector((state) => state.sheets.images);
-
   const memoizedErrors = useMemo(() => {
     return validationProductForm(formData);
   }, [formData]);
@@ -44,7 +47,11 @@ export default function TabFormCreateProduct({ isOpen, onClose, product }) {
         tamaño: product.talle || "",
         stock: product.stock || 0,
         precio: product.precio || "",
-        url: product.url ? product.url.split(",").map((url) => url.trim()) : [],
+        images: Array.isArray(product.images)
+          ? product.images
+          : product.images
+          ? product.images.split(",").map((image) => image.trim())
+          : [],
       });
     }
   }, [product]);
@@ -53,7 +60,7 @@ export default function TabFormCreateProduct({ isOpen, onClose, product }) {
     if (img && img.length > 0) {
       setFormData((prevData) => ({
         ...prevData,
-        url: [...prevData.url, ...img.map((image) => image[0])],
+        images: [...prevData.images, ...img.map((image) => image[0])],
       }));
       dispatch(clearImages());
     }
@@ -72,6 +79,9 @@ export default function TabFormCreateProduct({ isOpen, onClose, product }) {
     e.preventDefault();
     if (Object.keys(memoizedErrors).length === 0) {
       try {
+        console.log("formData.images:", formData.images);
+        const imagesArray = Array.isArray(formData.images)
+        ? formData.images : [formData.images];
         const newRow = {
           categoria: formData.categoria,
           nombre: formData.nombre,
@@ -79,8 +89,10 @@ export default function TabFormCreateProduct({ isOpen, onClose, product }) {
           tamaño: formData.tamaño,
           stock: formData.stock,
           precio: formData.precio,
-          url: formData.url.join(", "),
+          images: imagesArray,
         };
+
+        console.log("Datos enviados:", newRow);
 
         if (product) {
           const updatedRows = {
@@ -91,14 +103,22 @@ export default function TabFormCreateProduct({ isOpen, onClose, product }) {
             tamaño: formData.tamaño,
             stock: formData.stock,
             precio: formData.precio,
-            url: formData.url.join(", "),
+            images: imagesArray.join(", "),
           };
 
           dispatch(updateRow(updatedRows));
         } else {
           dispatch(addSheetRow(newRow));
         }
-        setFormData({});
+        setFormData({
+          nombre: "",
+          categoria: "",
+          tamaño: "",
+          stock: "",
+          color: "",
+          precio: 0,
+          images: [],
+        });
         onClose();
       } catch (error) {
         toast.error("Error al crear el nuevo producto");
@@ -112,16 +132,6 @@ export default function TabFormCreateProduct({ isOpen, onClose, product }) {
     const file = event.target.files[0];
 
     if (!file) {
-      setIsUploading(false); // No file selected, stop uploading
-      return;
-    }
-
-    // Validar formato de imagen
-    const allowedFormats = ["image/jpeg", "image/png", "image/webp"];
-    if (!allowedFormats.includes(file.type)) {
-      toast.error(
-        "Formato de imagen no soportado. Solo se permiten .jpg, .jpeg, .png, y .webp"
-      );
       setIsUploading(false);
       return;
     }
@@ -129,17 +139,38 @@ export default function TabFormCreateProduct({ isOpen, onClose, product }) {
     try {
       const compressedFile = await new Promise((resolve, reject) => {
         new Compressor(file, {
-          quality: 0.7, // Ajuste según pruebas
-          convertSize: 2000000, // Convierte imágenes mayores a 2MB en WebP
+          quality: 0.7,
+          convertSize: 2000000,
           success: resolve,
           error: reject,
           mimeType: "image/webp",
         });
       });
+
       const formDataImage = new FormData();
       formDataImage.append("file", compressedFile);
+      formDataImage.append("api_key", CLOUDINARY_API_KEY);
+      formDataImage.append("upload_preset", "NinaMza");
 
-      await dispatch(uploadImages(formDataImage));
+      const response = await fetch(
+        `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`,
+        {
+          method: "POST",
+          body: formDataImage,
+        }
+      );
+
+      const result = await response.json();
+      console.log("URL de la imagen subida:", result.secure_url);
+      if(result.secure_url){
+        setFormData((prevData) => ({
+          ...prevData,
+          images: [...(prevData.images || [])], // Asegúrate de que prevData.images sea un array
+        }));
+      }else{
+        console.error("Error uploading image:", result.error.message);
+        toast.error("Error al subir la imagen");  
+      }
     } catch (error) {
       console.error("Error uploading images:", error);
     } finally {
@@ -154,7 +185,7 @@ export default function TabFormCreateProduct({ isOpen, onClose, product }) {
   const handleImageDelete = (index) => {
     setFormData((prevData) => ({
       ...prevData,
-      url: prevData.url.filter((_, i) => i !== index),
+      images: prevData.images.filter((_, i) => i !== index), // Cambiado de "url" a "images"
     }));
   };
 
@@ -176,27 +207,26 @@ export default function TabFormCreateProduct({ isOpen, onClose, product }) {
               <div className="mt-4 cursor-pointer flex">
                 {isUploading && <Spinner />}
 
-                {formData?.url?.length > 0
-                  ? formData?.url?.map((url, index) => (
-                      <div
-                        key={index}
-                        className="relative mr-[5px] flex shadow-md rounded-full p-2 w-24 h-24 justify-center items-center border border-gray-800"
+                {formData?.images?.length > 0 &&
+                  formData?.images?.map((url, index) => (
+                    <div
+                      key={index}
+                      className="relative mr-[5px] flex shadow-md rounded-full p-2 w-24 h-24 justify-center items-center border border-gray-800"
+                    >
+                      <img
+                        src={url}
+                        alt={`uploaded-${index}`}
+                        className="w-16 h-16 rounded-full object-cover"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => handleImageDelete(index)}
+                        className="absolute bottom-0 right-0 flex justify-center items-center bg-red-500 text-white rounded-full p-1 w-6 h-6"
                       >
-                        <img
-                          src={url}
-                          alt={`uploaded-${index}`}
-                          className="w-16 h-16 rounded-full object-cover"
-                        />
-                        <button
-                          type="button"
-                          onClick={() => handleImageDelete(index)}
-                          className="absolute bottom-0 right-0 flex justify-center items-center bg-red-500 text-white rounded-full p-1 w-6 h-6"
-                        >
-                          &times;
-                        </button>
-                      </div>
-                    ))
-                  : ""}
+                        &times;
+                      </button>
+                    </div>
+                  ))}
               </div>
 
               <div
@@ -223,7 +253,7 @@ export default function TabFormCreateProduct({ isOpen, onClose, product }) {
                   id="imageUploadInput"
                   onChange={handleImageUpload}
                   className="hidden"
-                  multiple={false}
+                  multiple
                 />
               </div>
             </div>
@@ -257,20 +287,20 @@ export default function TabFormCreateProduct({ isOpen, onClose, product }) {
               errors.categoria ? "border-red-500" : "border-gray-400"
             }`}
           >
-             <option value="" disabled>
+            <option value="" disabled>
               Selecciona una categoría
             </option>
-            <option value="zapatos"> Abrigos </option>
-            <option value="camperas">Pantalones</option>
-            <option value="sweater">Tops</option>
-            <option value="vestidos">Bodys</option>
-            <option value="catsuit">Sweaters </option>
-            <option value="camisas">Vestidos</option>
-            <option value="pantalones">Catsuits</option>
-            <option value="faldas">Faldas-shorts</option>
-            <option value="perfumes">Accesorios</option>
-            <option value="conjuntos">Calzados</option>
-            <option value="conjuntos">Vapers</option>
+            <option value="Abrigos"> Abrigos </option>
+            <option value="Pantalones">Pantalones</option>
+            <option value="Tops">Tops</option>
+            <option value="Bodys">Bodys</option>
+            <option value="Sweaters">Sweaters </option>
+            <option value="Vestidos">Vestidos</option>
+            <option value="Catsuits">Catsuits</option>
+            <option value="Faldas">Faldas-shorts</option>
+            <option value="Accesorios">Accesorios</option>
+            <option value="Calzados">Calzados</option>
+            <option value="Vapers">Vapers</option>
             <option value="Perfumes">Perfumes</option>
             <option value="Bikinis">Bikinis</option>
           </select>

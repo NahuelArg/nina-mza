@@ -25,7 +25,10 @@ const {
   putSaleChangeState,
   getCategoriesDashboard,
 } = require("../Controllers/sheets/sheetsController.js");
-const uploadToS3 = require("../Controllers/sheets/uploadImages.js");
+const {uploadImages}= require("../Controllers/sheets/uploadImages.js");
+const { authMiddleware } = require("../Middleware/authMiddleware.js");
+const upload = require("../Middleware/uploadMiddleware.js");
+
 
 sheetsRouter.get("/data", async (req, res) => {
   try {
@@ -97,9 +100,10 @@ sheetsRouter.put("/product/:id", async (req, res) => {
   }
 });
 
-sheetsRouter.post("/images", (req, res) => {
-  uploadToS3(req, res);
-});
+
+
+// Ruta para subir múltiples imágenes
+sheetsRouter.post("/images", upload.array("images", 10), uploadImages)
 
 sheetsRouter.get("/sale", async (req, res) => {
   try {

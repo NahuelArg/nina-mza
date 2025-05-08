@@ -18,7 +18,7 @@ const ProductDetail = () => {
   const dispatch = useDispatch();
   const product = useSelector((state) => state.sheets.product);
   const cartItems = useSelector((state) => state.cart.cartItems); // Obtener el carrito del estado
-  const imgUrl = product?.url?.split(", ");
+  const imgUrl = product?.images?.split(", ");
 
   useEffect(() => {
     const fetchData = async () => {

@@ -34,6 +34,7 @@ async function authenticateToken(req, res, next) {
       "claudioarganaraz86@gmail.com",
       "matiassjv@gmail.com",
       "ryc.general@gmail.com",
+      "ninamza@polar-leaf-381705.iam.gserviceaccount.com"
     ];
     if (!allowedUsers.includes(decodedToken.email)) {
       return res.status(403).send("Forbidden: User does not have access");
@@ -76,7 +77,9 @@ async function authMiddleware(req, res, next) {
   try {
     const decodedToken = await verifyToken(token);
     const email = decodedToken.email;
-
+    console.log("Decoded Token", decodedToken);
+    
+    
     if (await isAdmin(email)) {
       req.user = decodedToken;
       next();

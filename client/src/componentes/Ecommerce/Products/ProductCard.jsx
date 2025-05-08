@@ -9,7 +9,7 @@ import toast from "react-hot-toast";
 const ProductCard = ({
   id,
   name,
-  url,
+  images,
   sku,
   price,
   quantity,
@@ -59,7 +59,7 @@ const ProductCard = ({
       onAddToCart({
         id,
         nombre: name,
-        url,
+        images,
         sku,
         precio: price,
         cantidad: quantity,
@@ -73,11 +73,11 @@ const ProductCard = ({
       <div>
         <div className="relative flex items-end overflow-hidden rounded-xl">
           <Link to={`/product/${id}`}>
-            {url.includes(",") ? (
-              <ImageComponent imageUrls={url} />
+            {typeof images === "string" && images.includes(",") ? (
+              <ImageComponent imageUrls={images} />
             ) : (
               <LazyLoadImage
-                src={url}
+                src={images}
                 alt={name}
                 className="w-64 h-64 object-cover"
               />

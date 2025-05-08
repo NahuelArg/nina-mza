@@ -3,7 +3,7 @@ require("dotenv").config();
 const { google } = require("googleapis");
 const {
   authorize,
-  appendRowPayment,
+  RowPayment,
   getSaleData,
 } = require("../sheets/sheetsController");
 

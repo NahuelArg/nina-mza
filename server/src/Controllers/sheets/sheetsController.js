@@ -48,7 +48,7 @@ async function getSheetData(auth) {
         talle: row[4],
         stock: parseInt(row[5]),
         precio: parseInt(row[6]),
-        url: row[7],
+        images: row[7] ? row[7].split(",").map((url)=>url.trim()) : [], // Asegúrate de que 'images' sea un array
         sku: row[8],
         publicado: row[9],
       };
@@ -85,7 +85,7 @@ async function getSheetDataById(id, auth) {
       talle: row[4],
       cantidad: row[5],
       precio: row[6],
-      url: row[7],
+      images: row[7],
       sku: row[8],
       publicado: row[9],
     }));
@@ -112,13 +112,14 @@ function generateSKU(category, name, color, count) {
 }
 
 async function appendRow(auth, rowData) {
+  console.log("Datos recibidos en appendRow:", rowData)
   const sheets = google.sheets({ version: "v4", auth });
+  console.log("GOOGLE_SHEETS_ID:", process.env.GOOGLE_SHEETS_ID);
+
   const { rows, lastId } = await getSheetData(auth);
   const newId = lastId + 1;
-  const { categoria, nombre, color, tamaño, stock, precio, url } = rowData;
-  const sku = generateSKU(categoria, nombre, color, newId);
-  const urlString = Array.isArray(url) ? url.join(", ") : url;
-  const publicadoValue = "no"; // Nueva variable para el valor de publicado
+  const { categoria, nombre, color, tamaño, stock, precio, images } = rowData;
+  const imagesString = Array.isArray(images) ? images.join(", ") : images;
   const newRow = [
     newId,
     categoria,
@@ -127,10 +128,11 @@ async function appendRow(auth, rowData) {
     tamaño,
     stock,
     precio,
-    urlString,
-    sku,
-    publicadoValue, // Usar la nueva variable aquí
+    imagesString,
+        generateSKU(categoria, nombre, color, newId),
+    "no", // Publicado por defecto como "no"
   ];
+  console.log("Datos enviados al backend:", newRow);
   const res = await sheets.spreadsheets.values.append({
     spreadsheetId: process.env.GOOGLE_SHEETS_ID,
     range: "Productos!A2:J",
@@ -156,9 +158,9 @@ async function updateRow(auth, rowData) {
   }
 
   // Convertir el array de URLs en una cadena, si es necesario
-  const urlString = Array.isArray(rowData.url)
-    ? rowData.url.join(", ")
-    : rowData.url;
+  const urlString = Array.isArray(rowData.images)
+    ? rowData.images.join(", ")
+    : rowData.images;
 
   // Construir la fila actualizada con los datos de rowData
   const updatedRow = [
@@ -800,8 +802,6 @@ async function getCategoriesDashboard(auth) {
     throw new Error(error.message);
   }
 }
-
-
 
 async function getAllColors(auth) {
   try {

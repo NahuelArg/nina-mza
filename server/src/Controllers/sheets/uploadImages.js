@@ -1,57 +1,32 @@
-const multiparty = require("multiparty");
-const fs = require("fs");
-const { S3Client, PutObjectCommand } = require("@aws-sdk/client-s3");
-const mime = require("mime-types");
+const cloudinary = require("cloudinary").v2;
 const dotenv = require("dotenv");
 dotenv.config();
-
-const bucketName = process.env.AWS_S3_BUCKET_NINA;
-
-const s3Client = new S3Client({
-  region: "us-east-1",
-  credentials: {
-    accessKeyId: process.env.AWS_ACCESS_KEY_NINA,
-    secretAccessKey: process.env.AWS_SECRET_KEY_NINA,
-  },
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-async function uploadToS3(req, res) {
-  const form = new multiparty.Form();
-  form.parse(req, async (err, fields, files) => {
-    if (err) {
-      return res.status(401).json({ error: "Error parsing form data" });
+const uploadImages = async (req, res) => {
+  try {
+    if (!req.files || req.files.length === 0) {
+      return res.status(400).json({ message: "No se enviaron imágenes" });
     }
 
-    const links = [];
+    const uploadPromises = req.files.map((file) =>
+      cloudinary.uploader.upload(file.path)
+    );
 
-    if (files.file) {
-      for (const file of files.file) {
-        const ext = file.originalFilename.split(".").pop();
-        const newFilename = Date.now() + "." + ext;
+    const results = await Promise.all(uploadPromises);
+    const imageUrls = results.map((result) => result.secure_url);
 
-        const fileStream = fs.createReadStream(file.path);
+    res.status(200).json({ imageUrl: imageUrls }); // el front espera `imageUrl` como array
+  } catch (error) {
+    console.error("Error al subir imágenes a Cloudinary:", error.message);
+    res.status(500).send("Error al subir imágenes");
+  }
+};
 
-        const uploadParams = {
-          Bucket: bucketName,
-          Key: newFilename,
-          Body: fileStream,
-          ACL: "public-read",
-          ContentType: mime.lookup(file.path) || 'application/octet-stream',
-        };
-
-        try {
-          await s3Client.send(new PutObjectCommand(uploadParams));
-          const link = `https://${bucketName}.s3.amazonaws.com/${newFilename}`;
-          links.push(link);
-        } catch (error) {
-          return res.status(401).json({ error: "Error uploading file to S3" });
-        }
-      }
-    } else {
-      return res.status(400).json({ error: "No file uploaded" });
-    }
-    return res.status(200).json({ links });
-  });
-}
-
-module.exports = uploadToS3;
+module.exports = {
+  uploadImages,
+};

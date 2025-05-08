@@ -32,7 +32,7 @@ function CartItem({ product }) {
 
   // Calcular el subtotal del producto
   const subtotal = product?.precio * cartQuantity;
-  const imgUrl = product?.url?.split(",")[0];
+  const imgUrl = product?.images?.split(",")[0];
   return (
     <div className="flex items-center gap-2 border rounded-lg px-2 py-2">
       {imgUrl ? (

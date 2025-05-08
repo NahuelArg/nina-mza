@@ -5,7 +5,7 @@ const cors = require("cors");
 const cookieParser = require("cookie-parser");
 const router = require("./Routes/indexRoutes");
 const invalidRoute = require("./Middleware/invalidRoute");
-require("dotenv").config(); // Configuración de entorno
+const cloudinary = require('cloudinary').v2
 
 const server = express();
 
@@ -28,5 +28,7 @@ server.use("/api", router); // Montar el router
 
 // Middleware para rutas no válidas de la API
 server.use("/api/*", invalidRoute);
+//Cloudinary Config
+
 
 module.exports = server;
