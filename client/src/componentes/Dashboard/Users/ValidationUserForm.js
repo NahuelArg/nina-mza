@@ -23,8 +23,8 @@ export default function validationUserForm(formData = {}) {
   }
 
   // Validar role
-  if (!formData.role) {
-    errors.role = "El rol es obligatorio";
+  if (!formData.role || typeof formData.role !== 'string') {
+    errors.role = "El rol es obligatorio y debe ser válido";
   } else if (!["seller"].includes(formData.role)) {
     errors.role = "El rol seleccionado es inválido";
   }

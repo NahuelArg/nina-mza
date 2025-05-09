@@ -16,7 +16,7 @@ const PurchaseProduct = ({ sale }) => {
       }`}
     >
       <img
-        src={sale?.product?.url.split(",")[0]}
+        src={Array.isArray(sale?.product?.images) ? sale.product.images[0] : sale?.product?.images?.split(",")[0]}
         alt={`${sale?.product?.nombre}`}
         width={80}
         height={80}

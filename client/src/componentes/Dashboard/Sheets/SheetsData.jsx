@@ -28,7 +28,7 @@ const SheetsData = ({
           <tbody className="text-center border border-gray-500">
             {data?.length > 0 ? (
               data.map((row, index) => {
-                const imgUrl = row?.url?.split(", ");
+                const imgUrl = Array.isArray(row?.images) ? row.images : [];
 
                 const rowClass =
                   row.stock === 0 ? "bg-red-500 text-white" : "";
@@ -61,8 +61,8 @@ const SheetsData = ({
                         ))
                       ) : (
                         <LazyLoadImage
-                          src={row?.url}
-                          alt={`Imagen ${row?.url}-${index}`}
+                          src={row?.images}
+                          alt={`Imagen ${row?.images}-${index}`}
                           className="w-16 h-16 rounded-full mr-[-36px] object-cover mb-2"
                         />
                       )}

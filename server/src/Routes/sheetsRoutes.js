@@ -34,6 +34,7 @@ sheetsRouter.get("/data", async (req, res) => {
   try {
     const auth = await authorize();
     const data = await getSheetData(auth);
+    console.log("Datos enviados desde /data:", data);
     res.json(data);
   } catch (error) {
     console.log({ error: error.message });
@@ -236,8 +237,10 @@ sheetsRouter.get("/categories", async (req, res) => {
   try {
     const auth = await authorize();
     const categories = await getAllCategories(auth);
+    console.log("Datos enviados desde /categories:", categories);
     res.json(categories);
   } catch (error) {
+    console.log({ error: error.message });
     res.status(500).send(error.message);
   }
 });

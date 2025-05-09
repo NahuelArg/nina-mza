@@ -134,7 +134,7 @@ const DisplayProductDashboard = ({ products }) => {
           talle: product.talle,
           cantidad: 1,
           precio: product.precio,
-          imagen: product.url,
+          imagen: product.images,
           sku: product.sku,
         };
         dispatch(addToCart(data));
@@ -237,7 +237,7 @@ const DisplayProductDashboard = ({ products }) => {
             <div className="grid grid-cols-3 px-3 py-3 gap-4 mt-5 overflow-y-auto h-auto">
               {filteredProducts &&
                 filteredProducts.map((product, i) => {
-                  const imageUrls = product.url?.split(", ");
+                  const imageUrls = Array.isArray(product.images) ? product.images : [];
                   return (
                     <button
                       key={i}
@@ -255,7 +255,7 @@ const DisplayProductDashboard = ({ products }) => {
                       ) : (
                         <LazyLoadImage
                           className="object-cover w-full rounded-md h-16 xl:h-32"
-                          src={product.url}
+                          src={imageUrls[0]}
                           alt={`${product.nombre}-1`}
                         />
                       )}
@@ -289,7 +289,7 @@ const DisplayProductDashboard = ({ products }) => {
             <div className="px-5 py-4 mt-5 overflow-y-auto h-64">
               {cartItems?.length > 0
                 ? cartItems?.map((item, i) => {
-                    const imgUrl = item?.imagen?.split(",");
+                    const imgUrl = item?.images?.split(",");
                     const product = products.find((p) => p.id === item.id);
                     const availableStock = product ? product.stock : 0;
                     return (

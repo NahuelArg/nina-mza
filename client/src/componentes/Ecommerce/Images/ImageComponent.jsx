@@ -2,7 +2,7 @@ import React from "react";
 import { LazyLoadImage } from "react-lazy-load-image-component";
 
 const ImageComponent = ({ imageUrls }) => {
-  const images = imageUrls.split(","); // Asumiendo que las URLs vienen en formato de cadena separada por comas
+  const images = Array.isArray(imageUrls) ? imageUrls : imageUrls.split(",");
 
   return (
     <LazyLoadImage

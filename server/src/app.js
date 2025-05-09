@@ -23,6 +23,12 @@ server.use(
   })
 );
 
+// Middleware para registrar solicitudes entrantes
+server.use((req, res, next) => {
+  console.log(`Solicitud entrante: ${req.method} ${req.url} desde ${req.headers.origin}`);
+  next();
+});
+
 // Ruta para manejar solicitudes a la raíz
 server.get('/', (req, res) => {
   res.send('Bienvenido a la API de Nina Showroom');
