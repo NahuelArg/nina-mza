@@ -48,7 +48,9 @@ async function getSheetData(auth) {
         talle: row[4],
         stock: parseInt(row[5]),
         precio: parseInt(row[6]),
-        images: row[7] ? row[7].split(",").map((url)=>url.trim()) : [], // Asegúrate de que 'images' sea un array
+        images: typeof row[7] === "string" && row[7].trim() !== ""
+          ? row[7].split(",").map((url) => url.trim())
+          : ["https://via.placeholder.com/150"],
         sku: row[8],
         publicado: row[9],
       };

@@ -36,12 +36,22 @@ export const fetchSheets = () => async (dispatch) => {
       },
     });
 
-    // Map imageUrls to the url field for each product
-    const productsWithUrls = res.data.products.map((product) => ({
-      ...product,
-      nombre: product.nombre || "Nombre no disponible",
-      images: Array.isArray(product.imageUrls) ? product.imageUrls : [product.imageUrls || ""],
-    }));
+    const productsWithUrls = res.data.products.map((product) => {
+      console.log("Producto recibido:", product); // DEPURACIÓN
+      let firstImage = "";
+      if (Array.isArray(product.images) && product.images.length > 0) {
+        firstImage = product.images[0];
+      } else if (Array.isArray(product.imageUrls) && product.imageUrls.length > 0) {
+        firstImage = product.imageUrls[0];
+      } else if (typeof product.images === "string" && product.images.length > 0) {
+        firstImage = product.images.split(",")[0].trim();
+      }
+      return {
+        ...product,
+        nombre: product.nombre || "Nombre no disponible",
+        images: firstImage ? [firstImage] : [],
+      };
+    });
 
     dispatch({
       type: FETCH_SHEETS,

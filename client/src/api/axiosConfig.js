@@ -6,7 +6,7 @@ import https from 'https';
 const isNode = typeof window === 'undefined';
 
 const instance = axios.create({
-  baseURL: process.env.NODE_ENV === 'production' ? 'https://nina-mza.onrender.com' : 'http://localhost:3000',
+  baseURL: 'https://nina-mza.onrender.com',
   withCredentials: true,
   ...(isNode && {
     httpsAgent: new https.Agent({

@@ -15,6 +15,9 @@ const ProdustHome = ({ allProducts }) => {
     }
   }, [cartError]);
 
+  console.log("Productos recibidos en ProdustHome:", allProducts);
+  console.log("Productos en ProdustHome:", allProducts);
+
   const publishedProducts = allProducts?.filter(
     (product) => product.publicado === "si"
   );
@@ -56,7 +59,7 @@ const FloatingProductCard = ({ product, dispatch }) => {
       <ProductCard
         id={product.id}
         name={product.nombre}
-        images={product.images}
+        images={Array.isArray(product.images) ? product.images[0] : product.images}
         sku={product.sku}
         price={product.precio}
         quantity={product.stock}

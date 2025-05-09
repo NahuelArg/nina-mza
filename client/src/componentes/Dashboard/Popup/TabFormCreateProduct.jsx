@@ -162,17 +162,20 @@ export default function TabFormCreateProduct({ isOpen, onClose, product }) {
 
       const result = await response.json();
       console.log("URL de la imagen subida:", result.secure_url);
-      if(result.secure_url){
+
+      if (result.secure_url) {
         setFormData((prevData) => ({
           ...prevData,
-          images: [...(prevData.images || [])], // Asegúrate de que prevData.images sea un array
+          images: [...(prevData.images || []), result.secure_url],
         }));
-      }else{
-        console.error("Error uploading image:", result.error.message);
-        toast.error("Error al subir la imagen");  
+        toast.success("Imagen subida exitosamente");
+      } else {
+        console.error("Error al subir la imagen:", result.error?.message);
+        toast.error("Error al subir la imagen");
       }
     } catch (error) {
-      console.error("Error uploading images:", error);
+      console.error("Error al subir la imagen:", error);
+      toast.error("Error al subir la imagen");
     } finally {
       setIsUploading(false);
     }

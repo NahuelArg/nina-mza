@@ -1,6 +1,6 @@
 import { useDispatch, useSelector } from "react-redux";
 // import { useState, useRef } from "react";productAction
-import { clearFilteredProducts, filterByCategory, renderCondition } from "../../../redux/actions/productActions";
+import { clearFilteredProducts, filterByCategory } from "../../../redux/actions/productActions";
 
 const Filter = () => {
   const categories = useSelector((state) => state.sheets.dashboardCategories);
