@@ -39,7 +39,8 @@ export const fetchSheets = () => async (dispatch) => {
     // Map imageUrls to the url field for each product
     const productsWithUrls = res.data.products.map((product) => ({
       ...product,
-      url: Array.isArray(product.imageUrls) ? product.imageUrls.join(",") : product.imageUrls || "",
+      nombre: product.nombre || "Nombre no disponible",
+      images: Array.isArray(product.imageUrls) ? product.imageUrls : [product.imageUrls || ""],
     }));
 
     dispatch({
