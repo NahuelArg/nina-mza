@@ -36,7 +36,7 @@ async function authenticateToken(req, res, next) {
       "ryc.general@gmail.com",
       "ninamza@polar-leaf-381705.iam.gserviceaccount.com"
     ];
-    if (!allowedUsers.includes(decodedToken.email)) {
+    if (!Array.isArray(allowedUsers) || typeof decodedToken.email !== "string" || !allowedUsers.includes(decodedToken.email)) {
       return res.status(403).send("Forbidden: User does not have access");
     }
 

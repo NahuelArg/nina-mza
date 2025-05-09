@@ -817,7 +817,7 @@ async function getAllColors(auth) {
               .normalize("NFD")
               .replace(/[\u0300-\u036f]/g, "");
 
-            return colorList.includes(",") ? colorList.split(",") : [colorList];
+            return typeof colorList === "string" && colorList.includes(",") ? colorList.split(",") : [colorList];
           })
       ),
     ];
@@ -848,9 +848,7 @@ async function getProductsByColor(auth, color) {
           .normalize("NFD")
           .replace(/[\u0300-\u036f]/g, "");
 
-        return colorList.includes(",")
-          ? colorList.split(",").includes(trimmedColor)
-          : colorList === trimmedColor;
+        return typeof colorList === "string" && colorList.includes(",") ? colorList.split(",").includes(trimmedColor) : colorList === trimmedColor;
       });
 
     if (filteredProducts.length === 0) {

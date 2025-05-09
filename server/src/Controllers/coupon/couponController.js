@@ -65,7 +65,7 @@ const toggleCouponStatus = async (req, res) => {
     const auth = await authorize();
     const sheets = google.sheets({ version: "v4", auth });
 
-    if (!["activate", "deactivate"].includes(action)) {
+    if (typeof action !== "string" || !["activate", "deactivate"].includes(action)) {
       return res
         .status(400)
         .json({ message: 'La acción debe ser "activate" o "deactivate".' });
@@ -190,7 +190,9 @@ async function validateCouponAndCalculateTotal(auth, data) {
         const categoriasDelCupon = cupon[9]?.split(", ") || [];
 
         // Verificar si los productos pertenecen a las categorías del cupón
-        const productosValidos = productos.filter((prod) => categoriasDelCupon.includes(prod.categoria));
+        const productosValidos = Array.isArray(categoriasDelCupon)
+          ? productos.filter((prod) => typeof prod.categoria === "string" && categoriasDelCupon.includes(prod.categoria))
+          : [];
 
         if (productosValidos.length === 0) {
           return { message: "El cupón no aplica a los productos seleccionados", total: totalVenta, descuento: 0, isValid: false };

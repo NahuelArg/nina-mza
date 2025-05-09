@@ -26,10 +26,10 @@ const PagePayment = () => {
   useEffect(() => {
     const filtered = allPayments.filter((payment) => {
       return (
-        payment.ordenId.toString().includes(searchTerm) ||
-        payment.pagoId.toString().includes(searchTerm) ||
-        payment.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        payment.dni.toString().includes(searchTerm)
+        payment.ordenId?.toString()?.includes(searchTerm) ||
+        payment.pagoId?.toString()?.includes(searchTerm) ||
+        payment.email?.toLowerCase()?.includes(searchTerm.toLowerCase()) ||
+        payment.dni?.toString()?.includes(searchTerm)
       );
     });
     setFilteredData(filtered);

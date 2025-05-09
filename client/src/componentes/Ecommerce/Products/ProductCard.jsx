@@ -73,7 +73,7 @@ const ProductCard = ({
       <div>
         <div className="relative flex items-end overflow-hidden rounded-xl">
           <Link to={`/product/${id}`}>
-            {typeof images === "string" && images.includes(",") ? (
+            {Array.isArray(images) && images.length > 1 ? (
               <ImageComponent imageUrls={images} />
             ) : (
               <LazyLoadImage

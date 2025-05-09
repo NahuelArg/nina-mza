@@ -177,10 +177,10 @@ const DisplayProductDashboard = ({ products }) => {
   };
 
   const filteredProducts = products.filter((product) => {
-    const lowerCaseSearchTerm = searchTerm?.toLowerCase();
+    const lowerCaseSearchTerm = searchTerm?.toLowerCase() || "";
     return (
-      product?.nombre?.toLowerCase().includes(lowerCaseSearchTerm) ||
-      product?.sku?.toLowerCase().includes(lowerCaseSearchTerm)
+      (product?.nombre?.toLowerCase()?.includes(lowerCaseSearchTerm) || "") ||
+      (product?.sku?.toLowerCase()?.includes(lowerCaseSearchTerm) || "")
     );
   });
 

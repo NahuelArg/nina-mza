@@ -50,9 +50,9 @@ const Products = () => {
 
     const filtered = data.filter(
       (item) =>
-        item.nombre.toLowerCase().includes(value) ||
-        item.categoria.toLowerCase().includes(value) ||
-        item.sku.toLowerCase().includes(value)
+        item.nombre?.toLowerCase()?.includes(value) ||
+        item.categoria?.toLowerCase()?.includes(value) ||
+        item.sku?.toLowerCase()?.includes(value)
     );
 
     setFilteredData(filtered);
