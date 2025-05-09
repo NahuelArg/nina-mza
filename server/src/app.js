@@ -23,9 +23,10 @@ server.use(
   })
 );
 
-// Middleware para registrar solicitudes entrantes
+// Middleware para registrar solicitudes entrantes con validación de Origin
 server.use((req, res, next) => {
-  console.log(`Solicitud entrante: ${req.method} ${req.url} desde ${req.headers.origin}`);
+  const origin = req.headers.origin || "Origen no definido";
+  console.log(`Solicitud entrante: ${req.method} ${req.url} desde ${origin}`);
   next();
 });
 
