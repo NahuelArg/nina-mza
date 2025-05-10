@@ -18,7 +18,10 @@ server.use(
     origin: [
       "https://ninamza.com.ar",
       "http://localhost:5173",
-      "https://nina-mza.onrender.com"],
+      "https://nina-mza.onrender.com",
+      "http://localhost:3000",
+      "nina-mza.vercel.app" // Agregalo
+    ],
     credentials: true,
   })
 );
