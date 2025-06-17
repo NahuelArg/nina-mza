@@ -25,7 +25,7 @@ server.use(
     credentials: true,
   })
 );
-app.use(express.static(path.join(__dirname, 'dist')));
+server.use(express.static(path.join(__dirname, 'dist')));
 
 // Middleware para registrar solicitudes entrantes con validación de Origin
 // Eliminado log de solicitudes para producción
