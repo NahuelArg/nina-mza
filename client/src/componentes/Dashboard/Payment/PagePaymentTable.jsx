@@ -8,7 +8,6 @@ const formatDate = (dateString) => {
 };
 
 const PagePaymentTable = ({ allPayments }) => {
-  console.log(allPayments);
   return (
     <div className="border border-gray-300 p-4">
       <div className="overflow-x-auto custom-scroll border border-gray-300 p-2">

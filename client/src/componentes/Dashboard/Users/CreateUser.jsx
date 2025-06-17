@@ -61,9 +61,7 @@ export default function CreateUser({ isOpen, onClose, user }) {
             password: formData.password,
             role: formData.role,
           };
-
-          console.log("Updating user: ", updatedUser);
-
+          // console.log("Updating user: ", updatedUser); // Eliminado por seguridad
           // dispatch(updateUser(updatedUser));
         } else {
           await createNewSeller(newUser);

@@ -2,7 +2,6 @@ import React from "react";
 import { doSignOut } from "../../../firebase/auth";
 import { Link } from "react-router-dom";
 const UserLogged = ({ user, onClose }) => {
-  console.log(user);
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-800 bg-opacity-50">
       <div className="relative max-w-md mx-auto md:max-w-2xl min-w-0 break-words bg-white w-full mb-6 shadow-lg rounded-xl mt-16">
