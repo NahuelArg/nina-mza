@@ -36,9 +36,7 @@ export const fetchSheets = () => async (dispatch) => {
       },
     });
 
-    const productsWithUrls = res.data.products.map((product) => {
-      console.log("Producto recibido:", product); // DEPURACIÓN
-      let firstImage = "";
+    const productsWithUrls = res.data.products.map((product) => {      let firstImage = "";
       if (Array.isArray(product.images) && product.images.length > 0) {
         firstImage = product.images[0];
       } else if (Array.isArray(product.imageUrls) && product.imageUrls.length > 0) {

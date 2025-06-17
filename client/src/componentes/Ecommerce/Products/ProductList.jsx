@@ -36,6 +36,7 @@ export default function ProductList({ allProducts }) {
   }, [allProducts]);
 
   const processColors = (colorString) => {
+    if (!colorString || typeof colorString !== "string") return [];
     return colorString
       .split(",") // Divide la cadena por comas
       .map((color) => color.trim().toLowerCase()) // Elimina espacios y convierte a minúsculas

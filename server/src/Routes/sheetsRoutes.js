@@ -34,7 +34,6 @@ sheetsRouter.get("/data", async (req, res) => {
   try {
     const auth = await authorize();
     const data = await getSheetData(auth);
-    console.log("Datos enviados desde /data:", JSON.stringify(data, null, 2));
     res.json(data);
   } catch (error) {
     console.log({ error: error.message });
@@ -236,9 +235,7 @@ sheetsRouter.get("/filter/:category", async (req, res) => {
 sheetsRouter.get("/categories", async (req, res) => {
   try {
     const auth = await authorize();
-    const categories = await getAllCategories(auth);
-    console.log("Datos enviados desde /categories:", JSON.stringify(categories, null, 2));
-    res.json(categories);
+    const categories = await getAllCategories(auth);    res.json(categories);
   } catch (error) {
     console.log({ error: error.message });
     res.status(500).send(error.message);
@@ -261,7 +258,9 @@ sheetsRouter.get("/colors", async (req, res) => {
     const colors = await getAllColors(auth);
     res.json(colors);
   } catch (error) {
-    res.status(500).send(error.message);
+    // Log completo para depuración
+    console.error("Error en /api/sheets/colors:", error);
+    res.status(500).send(error.message || "Error interno al obtener colores");
   }
 });
 

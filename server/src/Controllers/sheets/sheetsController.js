@@ -15,7 +15,7 @@ async function authorize() {
       auth_uri: process.env.GOOGLE_AUTH_URI,
       token_uri: process.env.GOOGLE_TOKEN_URI,
       auth_provider_x509_cert_url:
-        process.env.GOOGLE_AUTH_PROVIDER_X509_CERT_URL,
+      process.env.GOOGLE_AUTH_PROVIDER_X509_CERT_URL,
       client_x509_cert_url: process.env.GOOGLE_CLIENT_X509_CERT_URL,
       universe_domain: process.env.GOOGLE_UNIVERSE_DOMAIN,
     },
@@ -811,19 +811,19 @@ async function getAllColors(auth) {
     const colors = [
       ...new Set(
         products
-          .filter((product) => product.publicado === "si")
+          .filter((product) => product.publicado === "si" && product.color && product.color.trim() !== "")
           .flatMap((product) => {
             const colorList = product.color
               .trim()
               .toLowerCase()
               .normalize("NFD")
               .replace(/[\u0300-\u036f]/g, "");
-
-            return typeof colorList === "string" && colorList.includes(",") ? colorList.split(",") : [colorList];
+            return typeof colorList === "string" && colorList.includes(",")
+              ? colorList.split(",").map(c => c.trim()).filter(Boolean)
+              : [colorList];
           })
       ),
     ];
-
     return colors;
   } catch (error) {
     console.log({ error: error.message });

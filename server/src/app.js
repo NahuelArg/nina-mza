@@ -20,16 +20,16 @@ server.use(
       "http://localhost:5173",
       "https://nina-mza.onrender.com",
       "http://localhost:3000",
-      "nina-mza.vercel.app" // Agregalo
+      "http://nina-mza.vercel.app" // Agregalo
     ],
     credentials: true,
   })
 );
+app.use(express.static(path.join(__dirname, 'dist')));
 
 // Middleware para registrar solicitudes entrantes con validación de Origin
+// Eliminado log de solicitudes para producción
 server.use((req, res, next) => {
-  const origin = req.headers.origin || "Origen no definido";
-  console.log(`Solicitud entrante: ${req.method} ${req.url} desde ${origin}`);
   next();
 });
 
