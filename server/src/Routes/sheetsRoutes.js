@@ -29,18 +29,46 @@ const {uploadImages}= require("../Controllers/sheets/uploadImages.js");
 const { authMiddleware } = require("../Middleware/authMiddleware.js");
 const upload = require("../Middleware/uploadMiddleware.js");
 
+// --- CACHE CONFIG ---
+const CACHE_DURATION = 60 * 1000; // 1 minuto
+
+let dataCache = null;
+let dataCacheTime = 0;
+
+let categoriesCache = null;
+let categoriesCacheTime = 0;
+
+let colorsCache = null;
+let colorsCacheTime = 0;
+
+let filterCategoryCache = {};
+let filterCategoryCacheTime = {};
+
+let filterColorCache = {};
+let filterColorCacheTime = {};
+
+let tallesCache = null;
+let tallesCacheTime = 0;
+
+// --- ENDPOINTS CON CACHE ---
+
 
 sheetsRouter.get("/data", async (req, res) => {
+  const now = Date.now();
+  if (dataCache && now - dataCacheTime < CACHE_DURATION) {
+    return res.json(dataCache);
+  }
   try {
     const auth = await authorize();
     const data = await getSheetData(auth);
+    dataCache = data;
+    dataCacheTime = now;
     res.json(data);
   } catch (error) {
     console.log({ error: error.message });
     res.status(500).send(error.message);
   }
 });
-
 sheetsRouter.get("/data/:id", async (req, res) => {
   try {
     const { id } = req.params;
@@ -222,10 +250,19 @@ sheetsRouter.put("/decrease-stock", async (req, res) => {
 });
 
 sheetsRouter.get("/filter/:category", async (req, res) => {
+  const category = req.params.category;
+  const now = Date.now();
+  if (
+    filterCategoryCache[category] &&
+    now - filterCategoryCacheTime[category] < CACHE_DURATION
+  ) {
+    return res.json(filterCategoryCache[category]);
+  }
   try {
     const auth = await authorize();
-    const category = req.params.category;
     const data = await getProductsByCategory(auth, category);
+    filterCategoryCache[category] = data;
+    filterCategoryCacheTime[category] = now;
     res.json(data);
   } catch (error) {
     res.status(404).send("Producto no encontrado");
@@ -233,9 +270,16 @@ sheetsRouter.get("/filter/:category", async (req, res) => {
 });
 
 sheetsRouter.get("/categories", async (req, res) => {
+  const now = Date.now();
+  if (categoriesCache && now - categoriesCacheTime < CACHE_DURATION) {
+    return res.json(categoriesCache);
+  }
   try {
     const auth = await authorize();
-    const categories = await getAllCategories(auth);    res.json(categories);
+    const categories = await getAllCategories(auth);
+    categoriesCache = categories;
+    categoriesCacheTime = now;
+    res.json(categories);
   } catch (error) {
     console.log({ error: error.message });
     res.status(500).send(error.message);
@@ -253,22 +297,36 @@ sheetsRouter.get("/dashboard/categories", async (req, res) => {
 });
 
 sheetsRouter.get("/colors", async (req, res) => {
+  const now = Date.now();
+  if (colorsCache && now - colorsCacheTime < CACHE_DURATION) {
+    return res.json(colorsCache);
+  }
   try {
     const auth = await authorize();
     const colors = await getAllColors(auth);
+    colorsCache = colors;
+    colorsCacheTime = now;
     res.json(colors);
   } catch (error) {
-    // Log completo para depuración
     console.error("Error en /api/sheets/colors:", error);
     res.status(500).send(error.message || "Error interno al obtener colores");
   }
 });
 
 sheetsRouter.get("/filter/color/:color", async (req, res) => {
+  const color = req.params.color;
+  const now = Date.now();
+  if (
+    filterColorCache[color] &&
+    now - filterColorCacheTime[color] < CACHE_DURATION
+  ) {
+    return res.json(filterColorCache[color]);
+  }
   try {
     const auth = await authorize();
-    const color = req.params.color;
     const data = await getProductsByColor(auth, color);
+    filterColorCache[color] = data;
+    filterColorCacheTime[color] = now;
     res.json(data);
   } catch (error) {
     res.status(404).send("Producto no encontrado");
