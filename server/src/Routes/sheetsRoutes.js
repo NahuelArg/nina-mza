@@ -314,22 +314,26 @@ sheetsRouter.get("/colors", async (req, res) => {
 });
 
 sheetsRouter.get("/filter/color/:color", async (req, res) => {
-  const color = req.params.color;
   const now = Date.now();
-  if (
+  
+  try {
+    const auth = await authorize();
+    const color = req.params.color;
+    if (
     filterColorCache[color] &&
     now - filterColorCacheTime[color] < CACHE_DURATION
   ) {
     return res.json(filterColorCache[color]);
   }
-  try {
-    const auth = await authorize();
     const data = await getProductsByColor(auth, color);
     filterColorCache[color] = data;
     filterColorCacheTime[color] = now;
+    if(!data || data.length === 0) {
+      return res.status(200).json([]);
+    }
     res.json(data);
   } catch (error) {
-    res.status(404).send("Producto no encontrado");
+    res.status(500).send("Producto no encontrado");
   }
 });
 
