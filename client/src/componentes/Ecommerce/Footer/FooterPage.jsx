@@ -20,18 +20,15 @@ function FooterPage() {
                     Inicio
                   </a>
                 </li>
-                <li>
-                  <a href="#" className="hover:underline">
-                    Tienda
-                  </a>
-                </li>
+        
                 <li>
                   <a href="#" className="hover:underline">
                     Sobre nosotros
                   </a>
                 </li>
+
                 <li>
-                  <a href="#" className="hover:underline">
+                  <a href="+54 9 2614 16-1558" className="hover:underline">
                     Contacto
                   </a>
                 </li>
@@ -90,6 +87,7 @@ function FooterPage() {
                       src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a5/Instagram_icon.png/768px-Instagram_icon.png"
                       alt="Instagram"
                       style={{ width: "32px", height: "32px" }}
+                      to="instagram.com/ninamendoza.ok"
                     />
                   </a>
                 </li>

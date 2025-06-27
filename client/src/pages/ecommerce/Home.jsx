@@ -51,7 +51,7 @@ const Home = () => {
       >
         <Link
           className="flex flex-col justify-center items-center shadow-lg hover:bg-pink-50 hover:animate-pulse bg-gray-100 border border-gray-500 p-4 w-full rounded-lg mx-4"
-          to={"https://www.instagram.com/ninashowroomza/"}
+          to={"https://www.instagram.com/ninamendoza.ok/"}
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
