@@ -314,21 +314,21 @@ sheetsRouter.get("/colors", async (req, res) => {
 });
 
 sheetsRouter.get("/filter/color/:color", async (req, res) => {
-  const now = Date.now();
-  
   try {
     const auth = await authorize();
-    const color = req.params.color;
+    // Convierte el color a mayúsculas para que coincida con la hoja
+    const color = req.params.color.toUpperCase();
+    const now = Date.now();
     if (
-    filterColorCache[color] &&
-    now - filterColorCacheTime[color] < CACHE_DURATION
-  ) {
-    return res.json(filterColorCache[color]);
-  }
+      filterColorCache[color] &&
+      now - filterColorCacheTime[color] < CACHE_DURATION
+    ) {
+      return res.json(filterColorCache[color]);
+    }
     const data = await getProductsByColor(auth, color);
     filterColorCache[color] = data;
     filterColorCacheTime[color] = now;
-    if(!data || data.length === 0) {
+    if (!data || data.length === 0) {
       return res.status(200).json([]);
     }
     res.json(data);

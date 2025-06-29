@@ -39,7 +39,7 @@ const WhatsAppBubble = () => {
   }, [isVisible]);
 
   return (
-    <div className="fixed bottom-6 right-6 flex flex-col items-center z-50">
+    <div className="fixed bottom-28 right-6 flex flex-col items-center z-50">
       {isChatOpen && (
         <div className="bg-white p-4 rounded shadow-lg mb-2 flex flex-col items-center transition-opacity duration-300 w-64">
           <div className="flex items-center justify-between w-full mb-2">
