@@ -278,7 +278,9 @@ export const uploadImages = (formData) => async (dispatch) => {
   export const getProductsByColor = (color) => async (dispatch) => {
     try {
       const response = await instance.get(`/api/sheets/filter/color/${color}`);
-      const products = response.data.products;
+      const products = Array.isArray(response.data)
+        ? response.data
+        : response.data;
   
       dispatch({ type: FILTER_COLOR, payload: products });
     } catch (error) {

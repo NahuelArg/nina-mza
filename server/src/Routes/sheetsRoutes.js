@@ -328,10 +328,7 @@ sheetsRouter.get("/filter/color/:color", async (req, res) => {
     const data = await getProductsByColor(auth, color);
     filterColorCache[color] = data;
     filterColorCacheTime[color] = now;
-    if (!data || data.length === 0) {
-      return res.status(200).json([]);
-    }
-    res.json(data);
+   res.json(Array.isArray(data) ? data : []);
   } catch (error) {
     res.status(500).send("Producto no encontrado");
   }
