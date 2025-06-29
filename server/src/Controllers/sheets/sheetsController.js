@@ -40,11 +40,13 @@ async function getSheetData(auth) {
     }
 
     const products = rows.map((row) => {
+      categoria = row[1] ? row[1].trim():"";
+      color = typeof row[3] === "string" ? row[3].trim() : "";
       const product = {
         id: row[0],
-        categoria: row[1],
+        categoria,
         nombre: row[2],
-        color: row[3],
+        color,
         talle: row[4],
         stock: parseInt(row[5]),
         precio: parseInt(row[6]),
