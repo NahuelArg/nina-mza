@@ -725,11 +725,10 @@ async function getProductsByCategory(auth, category) {
     const { products } = await getSheetData(auth);
 
     // Normaliza y elimina espacios en blanco de la categoría recibida
-    const trimmedCategory = category
-      .trim()
+    const trimmedCategory = typeof category === "string" ? category.trim()
       .toLowerCase()
       .normalize("NFD")
-      .replace(/[\u0300-\u036f]/g, "");
+      .replace(/[\u0300-\u036f]/g, "") : "";
 
     // Filtra los productos basándose en la categoría normalizada y en el estado de publicación
     const filteredProducts = products.filter((product) => {
@@ -837,22 +836,22 @@ async function getProductsByColor(auth, color) {
   try {
     const { products } = await getSheetData(auth);
 
-    const trimmedColor = color
-      .trim()
+    const trimmedColor = typeof color === "string" ? color.trim()
       .toLowerCase()
       .normalize("NFD")
-      .replace(/[\u0300-\u036f]/g, "");
+      .replace(/[\u0300-\u036f]/g, "") : "";
+
 
     const filteredProducts = products
       .filter((product) => product.publicado === "si")
       .filter((product) => {
-        const colorList = product.color
+        const colorList = typeof product.color === "string" ? product.color
           .trim()
           .toLowerCase()
           .normalize("NFD")
-          .replace(/[\u0300-\u036f]/g, "");
+          .replace(/[\u0300-\u036f]/g, "") : "";
 
-        return typeof colorList === "string" && colorList.includes(",") ? colorList.split(",").includes(trimmedColor) : colorList === trimmedColor;
+        return typeof colorList.includes(",") ? colorList.split(",").map(c => c.trim()).includes(trimmedColor) : colorList === trimmedColor;
       });
 
     if (filteredProducts.length === 0) {

@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@mercadopago/sdk-react": "^0.0.19",
+    "@reduxjs/toolkit": "^2.8.2",
     "axios": "^1.7.2",
     "compressorjs": "^1.2.1",
     "crypto-js": "^4.2.0",

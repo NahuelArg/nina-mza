@@ -249,7 +249,7 @@ sheetsRouter.put("/decrease-stock", async (req, res) => {
   }
 });
 
-sheetsRouter.get("/filter/:category", async (req, res) => {
+sheetsRouter.get("/filter/category/:category", async (req, res) => {
   const category = req.params.category;
   const now = Date.now();
   if (
