@@ -20,7 +20,8 @@ server.use(
       "http://localhost:5173",
       "https://nina-mza.onrender.com",
       "http://localhost:3000",
-      "http://nina-mza.vercel.app" // Agregalo
+      "http://nina-mza.vercel.app",
+      "https://bug-free-space-goldfish-6674gpvrp5v2r6wj-5173.app.github.dev" // Codespaces/devcontainer
     ],
     credentials: true,
   })
