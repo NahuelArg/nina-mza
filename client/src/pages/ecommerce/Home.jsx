@@ -4,7 +4,7 @@ import { useInView } from "react-intersection-observer";
 import Navigation from "../../componentes/Ecommerce/Nav/Navigation";
 import Carrousel from "../../componentes/Ecommerce/Carrousel/Carrousel";
 import { fetchSheets } from "../../redux/actions/productActions";
-import ProdustHome from "../../componentes/Ecommerce/Products/ProdustHome";
+import ProductHome from "../../componentes/Ecommerce/Products/ProductHome";
 import Features from "../../componentes/Ecommerce/Features/Features";
 import FooterPage from "../../componentes/Ecommerce/Footer/FooterPage";
 import WhatsAppBubble from "../../componentes/Ecommerce/Whatsapp/WhatsAppBubble";
@@ -43,7 +43,7 @@ const Home = () => {
       <div
         className={`relative -top-18 md:-top-28 flex w-full justify-center items-center transition-transform duration-1000 bg-pink-100`}
       >
-          <ProdustHome allProducts={sheetsData} />
+          <ProductHome allProducts={sheetsData} />
       </div>
       <div
         ref={refProducts}

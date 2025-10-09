@@ -5,7 +5,7 @@ import { useDispatch, useSelector } from "react-redux";
 import toast from "react-hot-toast";
 import { addToCart } from "../../../redux/actions/cartActions";
 
-const ProdustHome = ({ allProducts }) => {
+const ProductHome = ({ allProducts }) => {
   const dispatch = useDispatch();
   const cartError = useSelector((state) => state.cart.cartError);
 
@@ -15,8 +15,7 @@ const ProdustHome = ({ allProducts }) => {
     }
   }, [cartError]);
 
-  console.log("Productos recibidos en ProdustHome:", allProducts);
-  console.log("Productos en ProdustHome:", allProducts);
+  console.log("Productos recibidos en ProductHome:", allProducts);
 
   const publishedProducts = allProducts?.filter(
     (product) => product.publicado === "si"
@@ -76,4 +75,4 @@ const handleAddToCart = (product, dispatch) => {
   dispatch(addToCart(product));
 };
 
-export default ProdustHome;
+export default ProductHome;

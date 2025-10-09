@@ -25,7 +25,7 @@ export const CLEAN_SEARCH_PRODUCT= "CLEAN_SEARCH_PRODUCT"
 
 export const GET_CASH_FLOW = "GET_CASH_FLOW";
 export const ADD_CASH_FLOW_ENTRY = "ADD_CASH_FLOW_ENTRY";
-
+export const FILTER_BY_PARAMS = "FILTER_BY_PARAMS";
 
 export const fetchSheets = () => async (dispatch) => {
   const token = localStorage.getItem("authToken");
@@ -36,7 +36,11 @@ export const fetchSheets = () => async (dispatch) => {
       },
     });
 
-    const productsWithUrls = res.data.products.map((product) => {      let firstImage = "";
+    // Verifica que products sea un array
+    const products = Array.isArray(res.data.products) ? res.data.products : [];
+
+    const productsWithUrls = products.map((product) => {
+      let firstImage = "";
       if (Array.isArray(product.images) && product.images.length > 0) {
         firstImage = product.images[0];
       } else if (Array.isArray(product.imageUrls) && product.imageUrls.length > 0) {
@@ -212,7 +216,7 @@ export const uploadImages = (formData) => async (dispatch) => {
   export const filterByCategory = (category) => async (dispatch) => {
     const token = localStorage.getItem("authToken");
     try {
-      const res = await instance.get(`/api/sheets/filter/${category}`, {
+      const res = await instance.get(`/api/sheets/filter/category/${category}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -278,11 +282,13 @@ export const uploadImages = (formData) => async (dispatch) => {
   export const getProductsByColor = (color) => async (dispatch) => {
     try {
       const response = await instance.get(`/api/sheets/filter/color/${color}`);
-      const products = Array.isArray(response.data)
+      const payload = Array.isArray(response.data)
         ? response.data
-        : response.data;
-  
-      dispatch({ type: FILTER_COLOR, payload: products });
+        : Array.isArray(response.data.products)
+        ? response.data.products
+        : [];
+
+      dispatch({ type: FILTER_COLOR, payload });
     } catch (error) {
       console.error("Error fetching products by color:", error);
     }
@@ -349,5 +355,42 @@ export const getCashFlow = () => async (dispatch) => {
     } catch (error) {
       console.error("Error añadiendo entrada:", error);
       toast.error("Error añadiendo la entrada de flujo de caja");
+    }
+  };
+
+  export const fetchSheetsByFilter = ({ category, color }) => async (dispatch) => {
+    try {
+      const params = new URLSearchParams();
+      if (category) params.append("category", category);
+      if (color) params.append("color", color);
+
+      const response = await instance.get(`/api/sheets/filter?${params.toString()}`);
+
+      const products = Array.isArray(response.data)
+        ? response.data
+        : Array.isArray(response.data?.products)
+        ? response.data.products
+        : [];
+
+      const productsWithUrls = products.map((product) => {
+        let firstImage = "";
+        if (Array.isArray(product.images) && product.images.length > 0) {
+          firstImage = product.images[0];
+        } else if (Array.isArray(product.imageUrls) && product.imageUrls.length > 0) {
+          firstImage = product.imageUrls[0];
+        } else if (typeof product.images === "string" && product.images.length > 0) {
+          firstImage = product.images.split(",")[0].trim();
+        }
+        return {
+          ...product,
+          nombre: product.nombre || "Nombre no disponible",
+          images: firstImage ? [firstImage] : [],
+        };
+      });
+
+      dispatch({ type: FILTER_BY_PARAMS, payload: productsWithUrls });
+    } catch (error) {
+      console.error("Error fetching sheets by filter:", error);
+      dispatch({ type: FILTER_BY_PARAMS, payload: [] });
     }
   };

@@ -730,15 +730,20 @@ async function getProductsByCategory(auth, category) {
       .normalize("NFD")
       .replace(/[\u0300-\u036f]/g, "") : "";
 
+    // LOG: Muestra cómo llega la categoría desde la ruta
+    console.log("Categoria recibida:", category);
+    console.log("Categoria normalizada:", trimmedCategory);
+
     // Filtra los productos basándose en la categoría normalizada y en el estado de publicación
     const filteredProducts = products.filter((product) => {
+      const prodCat = typeof product.categoria === "string"
+        ? product.categoria.trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+        : "";
+      // LOG: Muestra cómo es la categoría de cada producto
+      console.log("Categoria producto:", product.categoria, "Normalizada:", prodCat);
       return (
         product.publicado === "si" &&
-        product.categoria
-          .trim()
-          .toLowerCase()
-          .normalize("NFD")
-          .replace(/[\u0300-\u036f]/g, "") === trimmedCategory
+        prodCat === trimmedCategory
       );
     });
 

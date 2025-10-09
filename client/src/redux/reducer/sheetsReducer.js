@@ -1,4 +1,3 @@
-// sheetsReducer.js
 import {
   FETCH_SHEETS,
   ADD_SHEET_ROW,
@@ -20,7 +19,8 @@ import {
   SET_VARIABLE,
   SEARCH_PRODUCT,
   CLEAN_SEARCH_PRODUCT,
-  GET_DASHBOARD_CATEGORIES
+  GET_DASHBOARD_CATEGORIES,
+  FILTER_BY_PARAMS,
 } from "../actions/productActions";
 
 const initialState = {
@@ -32,12 +32,14 @@ const initialState = {
   images: [],
   filterProducts: [],
   categories: [],
-  dashboardCategories:[],
+  dashboardCategories: [],
   cashFlow: [],
   colors: [],
   filterColors: [],
   searchedProducts: [],
-  filterVar: null,
+  filterVar: { category: "", color: "" },
+  allProducts: [],
+  filteredProducts: [],
 };
 
 const sheetsReducer = (state = initialState, action) => {
@@ -46,123 +48,91 @@ const sheetsReducer = (state = initialState, action) => {
       return {
         ...state,
         sheetsData: action.payload,
+        allProducts: Array.isArray(action.payload) ? action.payload : [],
         loading: false,
       };
+
     case FETCH_PRODUCT_SHEET_BY_ID:
-      return {
-        ...state,
-        product: action.payload,
-      };
+      return { ...state, product: action.payload };
+
     case ADD_SHEET_ROW:
-      return {
-        ...state,
-        sheetsData: [...state.sheetsData, action.payload],
-      };
+      return { ...state, sheetsData: [...state.sheetsData, action.payload] };
+
     case UPDATE_SHEET_ROW:
       return {
         ...state,
-        sheetsData: state.sheetsData.map((row) =>
-          row[0] === action.payload[0] ? action.payload : row
-        ),
+        sheetsData: state.sheetsData.map((row) => (row[0] === action.payload[0] ? action.payload : row)),
       };
+
     case DELETE_SHEET_ROW:
-      return {
-        ...state,
-        sheetsData: state.sheetsData.filter(
-          (row) => row[0] !== action.payload // Utiliza el ID para filtrar
-        ),
-      };
+      return { ...state, sheetsData: state.sheetsData.filter((row) => row[0] !== action.payload) };
+
     case UPLOAD_IMAGES_SUCCESS:
-      return {
-        ...state,
-        images: [...state.images, action.payload],
-        error: null,
-      };
+      return { ...state, images: [...state.images, action.payload], error: null };
+
     case UPLOAD_IMAGES_FAILURE:
-      return {
-        ...state,
-        error: action.payload,
-      };
-    case CLEAR_IMAGES: // Caso para limpiar imágenes
-      return {
-        ...state,
-        images: [],
-      };
+      return { ...state, error: action.payload };
+
+    case CLEAR_IMAGES:
+      return { ...state, images: [] };
 
     case SET_CONDITION:
       return { ...state, rCondition: action.payload };
 
-    case SET_VARIABLE:
-      return { ...state, filterVar: action.payload };  
+    case SET_VARIABLE: {
+      const payload = action.payload;
+      const normalized =
+        payload == null
+          ? { category: "", color: "" }
+          : typeof payload === "string"
+          ? { category: payload, color: "" }
+          : { category: payload.category || "", color: payload.color || "" };
+      return { ...state, filterVar: normalized };
+    }
 
-    case FILTER_CATEGORY: // Productos filtrados por categoria
-      return {
-        ...state,
-        filterProducts: action.payload,
-      };
+    case FILTER_CATEGORY:
+      return { ...state, filterProducts: action.payload, filteredProducts: Array.isArray(action.payload) ? action.payload : [] };
 
-    case CLEAR_COLOR: // Limpiar filtro de colores
-      return {
-        ...state,
-        filterColors: [],
-      };  
+    case CLEAR_COLOR:
+      return { ...state, filterColors: [] };
 
     case CLEAR_FILTER:
-      return { ...state, filterProducts: [] };
+      return { ...state, filterProducts: [], filteredProducts: [] };
 
-    case GET_CATEGORIES: // Obtener todas las categorias
-      return {
-        ...state,
-        categories: action.payload,
-      };
+    case GET_CATEGORIES:
+      return { ...state, categories: action.payload };
 
-      case GET_DASHBOARD_CATEGORIES:
-        return {
-          ...state,
-          dashboardCategories: action.payload
-        };  
+    case GET_DASHBOARD_CATEGORIES:
+      return { ...state, dashboardCategories: action.payload };
 
     case GET_COLORS:
-      return {
-        ...state,
-        colors: action.payload,
-      };
+      return { ...state, colors: action.payload };
+
     case FILTER_COLOR:
-      return {
-        ...state,
-        filterColors: action.payload,
-      };
-      case SEARCH_PRODUCT:
-  const searchTerm = action.payload.toLowerCase();
+      return { ...state, filterColors: action.payload };
 
-  const searchedProducts = state.sheetsData.filter(item =>
-    typeof item?.nombre === "string" && item.nombre.toLowerCase().includes(searchTerm)
-  );
+    case SEARCH_PRODUCT: {
+      const searchTerm = (action.payload || "").toString().toLowerCase();
+      const searchedProducts = state.sheetsData.filter((item) => typeof item?.nombre === "string" && item.nombre.toLowerCase().includes(searchTerm));
+      return { ...state, searchedProducts };
+    }
 
-  return {
-    ...state,
-    searchedProducts
-  };
     case CLEAN_SEARCH_PRODUCT:
-      return {
-        ...state,
-        searchedProducts: []
-      }    
+      return { ...state, searchedProducts: [] };
 
     case GET_CASH_FLOW:
-      return {
-        ...state,
-        cashFlow: action.payload,
-      };
+      return { ...state, cashFlow: action.payload };
 
     case ADD_CASH_FLOW_ENTRY:
-      return {
-        ...state,
-        cashFlow: [...state.cashFlow, action.payload],
-      };
+      return { ...state, cashFlow: [...state.cashFlow, action.payload] };
+
+    case FILTER_BY_PARAMS:
+      return { ...state, filteredProducts: Array.isArray(action.payload) ? action.payload : [] };
+
     default:
       return state;
   }
 };
 
 export default sheetsReducer;
+

@@ -9,6 +9,7 @@ import {
   filterByCategory,
   renderCondition,
   setVariable,
+  fetchSheetsByFilter,
 } from "../../../redux/actions/productActions";
 
 const Navigation = ({ isCart }) => {
@@ -59,6 +60,7 @@ const Navigation = ({ isCart }) => {
   const cartItems = useSelector((state) => state.cart.cartItems);
   const user = useSelector((state) => state.auth.user);
   const categories = useSelector((state) => state.sheets.categories);
+  const existing = useSelector((state) => state.sheets.filterVar);
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
@@ -94,9 +96,15 @@ const Navigation = ({ isCart }) => {
 
   const handleFilter = (category) => {
     if (category !== "Todos") {
-      dispatch(filterByCategory(category));
+      // build filter object, keep any current color
+      const newFilter = {};
+      if (existing && typeof existing === "object") Object.assign(newFilter, existing);
+      else if (existing && typeof existing === "string") newFilter.category = existing;
+      newFilter.category = category;
+
+      dispatch(fetchSheetsByFilter(newFilter));
       dispatch(renderCondition("filteredProducts"));
-      dispatch(setVariable(category));
+      dispatch(setVariable(newFilter));
     } else {
       dispatch(renderCondition("allProducts"));
       dispatch(clearFilteredProducts());

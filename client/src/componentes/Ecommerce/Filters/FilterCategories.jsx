@@ -1,22 +1,29 @@
 import { useDispatch, useSelector } from "react-redux";
 import { useState, useRef } from "react";
-import { clearFilteredProducts, filterByCategory, renderCondition, setVariable } from "../../../redux/actions/productActions";
+import { clearFilteredProducts, filterByCategory, renderCondition, setVariable, fetchSheetsByFilter } from "../../../redux/actions/productActions";
 
 const FilterCategories = () => {
   const categories = useSelector((state) => state.sheets.categories);
+  const existing = useSelector((state) => state.sheets.filterVar);
   const dispatch = useDispatch();
 
   const handleFilter = (event) => {
     const category = event.target.value;
 
     if (category !== "Todos") {
-      dispatch(filterByCategory(category));
+      // build new filter object keeping any existing color
+      const newFilter = {};
+      if (existing && typeof existing === "object") Object.assign(newFilter, existing);
+      else if (existing && typeof existing === "string") newFilter.category = existing;
+      newFilter.category = category;
+
+      dispatch(fetchSheetsByFilter(newFilter));
       dispatch(renderCondition("filteredProducts"));
-      dispatch(setVariable(category))
+      dispatch(setVariable(newFilter));
     } else {
       dispatch(renderCondition("allProducts"));
       dispatch(clearFilteredProducts());
-      dispatch(setVariable(null))
+      dispatch(setVariable(null));
     }
   };
 

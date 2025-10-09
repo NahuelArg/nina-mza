@@ -1,22 +1,40 @@
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import React from "react";
-import { useSelector } from "react-redux";
-import { clearColor, getProductsByColor, renderCondition, setVariable } from "../../../redux/actions/productActions";
+import { clearColor, getProductsByColor, renderCondition, setVariable, fetchSheetsByFilter } from "../../../redux/actions/productActions";
 const FilterColor = () => {
   const colors = useSelector((state) => state.sheets.colors);
   const dispatch = useDispatch();
+
+  const filterVar = useSelector((state) => state.sheets.filterVar);
 
   const handleColorFilter = (event) => {
     const color = event.target.value;
 
     if (color !== "Todos") {
-      dispatch(getProductsByColor(color));
-      dispatch(renderCondition("filteredColor"));
-      dispatch(setVariable(color))
+      const newFilter = {};
+      if (filterVar && typeof filterVar === "object") Object.assign(newFilter, filterVar);
+      else if (filterVar && typeof filterVar === "string") newFilter.category = filterVar;
+      newFilter.color = color;
+
+      dispatch(fetchSheetsByFilter(newFilter));
+      dispatch(renderCondition("filteredProducts"));
+      dispatch(setVariable(newFilter));
     } else {
-      dispatch(renderCondition("allProducts"));
-      dispatch(clearColor());
-      dispatch(setVariable(null))
+      // If 'Todos' selected, remove color from filter. If a category exists, fetch by category only
+      if (filterVar && typeof filterVar === "object" && filterVar.category) {
+        const newFilter = { category: filterVar.category };
+        dispatch(fetchSheetsByFilter(newFilter));
+        dispatch(renderCondition("filteredProducts"));
+        dispatch(setVariable(newFilter));
+      } else if (filterVar && typeof filterVar === "string") {
+        dispatch(fetchSheetsByFilter({ category: filterVar }));
+        dispatch(renderCondition("filteredProducts"));
+        dispatch(setVariable({ category: filterVar }));
+      } else {
+        dispatch(renderCondition("allProducts"));
+        dispatch(clearColor());
+        dispatch(setVariable(null));
+      }
     }
   };
 

@@ -8,11 +8,14 @@ import ScrollToTopButton from "../Scroll/ScrollToTopButton";
 import { addToCart } from "../../../redux/actions/cartActions";
 import SearchBar from "../Searchbar/SearchBar";
 import Loader from "../Loader/Loader";
+import React from "react";
 
 export default function ProductList({ allProducts }) {
   const [visibleProducts, setVisibleProducts] = useState(8); // Mostrar 8 productos inicialmente
   const dispatch = useDispatch();
   const cartError = useSelector((state) => state.cart.cartError);
+
+  const filterVar = useSelector((state) => state.sheets.filterVar);
 
   const publishedProducts = allProducts?.filter(
     (product) => product.publicado === "si"
@@ -47,34 +50,50 @@ export default function ProductList({ allProducts }) {
     setVisibleProducts((prevVisible) => prevVisible + 8); // Incrementa los productos visibles en 8 cada vez que se presiona el botón
   };
 
+  const items = Array.isArray(allProducts) ? allProducts : [];
+
+  if (items.length === 0) {
+    const hasActiveFilter =
+      filterVar && typeof filterVar === "object" && (
+        (filterVar.category && filterVar.category.toString().trim() !== "") ||
+        (filterVar.color && filterVar.color.toString().trim() !== "")
+      );
+
+    return (
+      <Layout items={0}>
+        <div className="text-center text-gray-600 font-bold text-2xl mt-16 h-screen">
+          {hasActiveFilter ? (
+            "No se encontraron productos para este filtro"
+          ) : (
+            <Loader />
+          )}
+        </div>
+      </Layout>
+    );
+  }
+          
+
   return (
     <Layout items={currentProducts.length}>
       <div className="h-full mt-4 mb-16 flex justify-center items-center flex-col p-2 rounded-md">
-      
-        {currentProducts.length === 0 ? (
-          <div className="text-center text-gray-600 font-bold text-2xl mt-16 h-screen">
-            <Loader />
-          </div>
-        ) : (
-          <div className="max-w-screen grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-2">
-            {currentProducts.map((product) => {
-              return (
-                <ProductCard
-                  key={product.id}
-                  id={product.id}
-                  name={product.nombre}
-                  images={product.images}
-                  sku={product.sku}
-                  price={product.precio}
-                  quantity={product.stock}
-                  colors={processColors(product.color)}
-                  onAddToCart={handleAddToCart} // Pasar directamente handleAddToCart
-                  isNew={false}
-                />
-              );
-            })}
-          </div>
-        )}
+        <div className="max-w-screen grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-2">
+          {currentProducts.map((product) => {
+            return (
+              <ProductCard
+                key={product.id}
+                id={product.id}
+                name={product.nombre}
+                images={product.images}
+                sku={product.sku}
+                price={product.precio}
+                quantity={product.stock}
+                colors={processColors(product.color)}
+                onAddToCart={handleAddToCart} // Pasar directamente handleAddToCart
+                isNew={false}
+              />
+            );
+          })}
+        </div>
         <InfiniteScroll
           visibleProducts={visibleProducts}
           totalProducts={allProducts.length}

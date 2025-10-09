@@ -28,6 +28,7 @@ const {
 const {uploadImages}= require("../Controllers/sheets/uploadImages.js");
 const { authMiddleware } = require("../Middleware/authMiddleware.js");
 const upload = require("../Middleware/uploadMiddleware.js");
+const { response } = require("../app.js");
 
 // --- CACHE CONFIG ---
 const CACHE_DURATION = 60 * 1000; // 1 minuto
@@ -56,17 +57,25 @@ let tallesCacheTime = 0;
 sheetsRouter.get("/data", async (req, res) => {
   const now = Date.now();
   if (dataCache && now - dataCacheTime < CACHE_DURATION) {
+    // Asegura que dataCache siempre tenga la forma { products: [...] }
     return res.json(dataCache);
   }
   try {
     const auth = await authorize();
     const data = await getSheetData(auth);
-    dataCache = data;
+       const response = Array.isArray(data)
+      ? { products: data }
+      : data && Array.isArray(data.products)
+      ? data
+      : { products: [] };
+    dataCache = response;
     dataCacheTime = now;
-    res.json(data);
+    // Siempre responde { products: [...] }
+   console.log("Respuesta /api/sheets/data - productos:", response.products.length);
+    return res.json(response);
   } catch (error) {
-    console.log({ error: error.message });
-    res.status(500).send(error.message);
+    console.error("Error en /api/sheets/data:", error.stack || error);
+    return res.status(500).json({ error: error.message || "Error interno del servidor" });
   }
 });
 sheetsRouter.get("/data/:id", async (req, res) => {
@@ -248,6 +257,45 @@ sheetsRouter.put("/decrease-stock", async (req, res) => {
     res.status(500).send(error.message);
   }
 });
+// ...existing code...
+sheetsRouter.get("/filter", async (req, res) => {
+  try {
+    const auth = await authorize();
+    const { category = "", color = "" } = req.query;
+
+    const normalize = (s) =>
+      typeof s === "string"
+        ? s.trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+        : "";
+
+    const catNorm = normalize(category);
+    const colorNorm = normalize(color);
+
+    const { products = [] } = await getSheetData(auth);
+
+    const filtered = (products || [])
+      .filter((p) => p.publicado === "si")
+      .filter((p) => {
+        const prodCat = normalize(p.categoria || "");
+        const prodColor = normalize(p.color || "");
+
+        const matchesCategory = catNorm ? prodCat === catNorm : true;
+
+        const matchesColor = colorNorm
+          ? prodColor.includes(",")
+            ? prodColor.split(",").map((c) => c.trim()).includes(colorNorm)
+            : prodColor === colorNorm
+          : true;
+
+        return matchesCategory && matchesColor;
+      });
+
+    return res.json(Array.isArray(filtered) ? filtered : []);
+  } catch (error) {
+    console.error("Error en /api/sheets/filter:", error.stack || error);
+    return res.status(500).json({ error: error.message || "Error interno al filtrar" });
+  }
+});
 
 sheetsRouter.get("/filter/category/:category", async (req, res) => {
   const category = req.params.category;
@@ -313,26 +361,48 @@ sheetsRouter.get("/colors", async (req, res) => {
   }
 });
 
+// ...existing code...
 sheetsRouter.get("/filter/color/:color", async (req, res) => {
   try {
     const auth = await authorize();
-    // Convierte el color a mayúsculas para que coincida con la hoja
-    const color = req.params.color.toUpperCase();
+    const colorParam = req.params.color || "";
+    const color = colorParam.toUpperCase();
     const now = Date.now();
+
+    // Return cached array if valid
     if (
       filterColorCache[color] &&
       now - filterColorCacheTime[color] < CACHE_DURATION
     ) {
-      return res.json(filterColorCache[color]);
+      const cached = filterColorCache[color];
+      const products = Array.isArray(cached)
+        ? cached
+        : Array.isArray(cached?.products)
+        ? cached.products
+        : [];
+      return res.json(products);
     }
+
+    // Call controller to get products by color
     const data = await getProductsByColor(auth, color);
-    filterColorCache[color] = data;
+
+    // Normalize controller response to an array
+    const products = Array.isArray(data)
+      ? data
+      : Array.isArray(data?.products)
+      ? data.products
+      : [];
+
+    // Cache and respond
+    filterColorCache[color] = products;
     filterColorCacheTime[color] = now;
-   res.json(Array.isArray(data) ? data : []);
+    return res.json(products);
   } catch (error) {
-    res.status(500).send("Producto no encontrado");
+    console.error("Error en /api/sheets/filter/color/:color", error.stack || error);
+    return res.status(500).json({ error: error.message || "Error interno al filtrar por color" });
   }
 });
+// ...existing code...
 
 sheetsRouter.get("/cashflow", async (req, res) => {
   try {

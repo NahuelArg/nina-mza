@@ -162,7 +162,7 @@ const Layout = ({ children, items }) => {
               {/* Filter Variable */}
               {filterVar && (
                 <div className="mt-2 flex items-center text-black p-2 rounded-md">
-                  <p>{filterVar}</p>
+                  <p>{typeof filterVar === 'object' ? `${filterVar.category || ''} ${filterVar.color ? '- ' + filterVar.color : ''}` : filterVar}</p>
                   <button
                     onClick={handleClearFilter}
                     className="ml-1 bg-red-500 text-white rounded-full p-1 flex justify-center items-center"
